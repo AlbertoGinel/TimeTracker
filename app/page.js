@@ -1,28 +1,43 @@
-import Image from "next/image";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-import Link from "next/link";
+"use client";
 
-export default async function Home() {
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient({
-    cookies: () => cookieStore,
-  });
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useEffect, useState } from "react";
+import ActivityContainer from "./components/ActivityContainer";
+import StampContainer from "./components/StampContainer";
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export default function Home() {
+  const supabase = createClientComponentClient();
+  const [user, setUser] = useState(null);
 
-  //console.log({ user });
-  //console.log({ identities: user?.identities });
+  useEffect(() => {
+    async function getUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUser(user);
+    }
+    getUser();
+  }, []);
 
-  if (!user) {
-    return (
-      <main>
-        <Link href={"/login"}>You are not logged in. Click here to login</Link>
-      </main>
-    );
-  }
-
-  return <>Hi {user?.email}</>;
+  return (
+    <>
+      <div>Client render forever: {user?.email}</div>
+      {user && (
+        <>
+          <div className="grid grid-cols-3 gap-4">
+            {/* Your grid items go here */}
+            <div className="bg-gray-300 p-4">
+              <ActivityContainer />
+            </div>
+            <div className="bg-gray-300 p-4">
+              <StampContainer />
+            </div>
+            <div className="bg-gray-300 p-4">
+              <>Intervals</>
+            </div>
+          </div>
+        </>
+      )}
+    </>
+  );
 }
