@@ -2,6 +2,7 @@ import prisma from "@/app/libs/Prisma";
 import { NextResponse } from "next/server";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
+import moment from "moment";
 
 export async function GET() {
   const supabase = createServerComponentClient({ cookies });
@@ -46,12 +47,12 @@ export async function POST(req) {
 
     const body = await req.json();
 
-    const currentDate = new Date();
+    const currentDate = moment();
 
     const createdStamp = await prisma.stamps.create({
       data: {
         usersId: user?.id,
-        time: currentDate.toISOString(),
+        time: currentDate.format("YYYY-MM-DDTHH:mm:ss.000Z"),
         type: body.type,
         activitiesId: body.activitiesId,
       },
@@ -61,8 +62,6 @@ export async function POST(req) {
       ...createdStamp,
       id: createdStamp.id,
     };
-
-    //console.log("estamos en route:", createdStampWithId);
 
     await prisma.$disconnect();
     return NextResponse.json(createdStampWithId);

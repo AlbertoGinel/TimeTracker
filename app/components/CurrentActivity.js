@@ -1,7 +1,8 @@
 "use client";
 
 import useCurrentActivity from "../context/currentActivity";
-import { DateTime, Duration } from "luxon";
+import * as moment from "moment";
+import "moment-timezone"; // Make sure to import the timezone data
 import { useEffect, useState } from "react";
 
 export default function CurrentActivity() {
@@ -24,21 +25,16 @@ export default function CurrentActivity() {
 
       if (response.ok) {
         const result = await response.json();
-        //console.log("Stamp sent successfully:", result);
-        // Handle the successful response here
       } else {
         const errorData = await response.json();
         console.error("Error sending stamp:", errorData);
-        // Handle the error response here
       }
     } catch (error) {
       console.error("Error sending stamp:", error);
-      // Handle other errors (e.g., network issues) here
     }
   };
 
   const handleButtonClick = () => {
-    //console.log("stoping: ", currentActivity);
     stop(currentActivity);
     sendStamp({
       type: "stop",
@@ -48,33 +44,27 @@ export default function CurrentActivity() {
 
   useEffect(() => {
     if (currentActivity && currentActivity.isStarted) {
-      //console.log("currentActivity", currentActivity);
-      const utcDateTime = DateTime.fromISO(currentActivity.timeStamp, {
-        zone: "utc",
-      });
-      const localDateTime = utcDateTime.toLocal();
+      const utcDateTime = moment.utc(currentActivity.timeStamp);
+      const localDateTime = utcDateTime.local();
 
-      setFormattedLocalTime(localDateTime.toFormat("HH:mm"));
+      setFormattedLocalTime(localDateTime.format("HH:mm"));
 
       // Start the timer
       const intervalId = setInterval(() => {
-        const now = DateTime.local();
-        const elapsed = now.diff(utcDateTime, ["seconds"]).seconds;
+        const now = moment();
+        const elapsed = now.diff(utcDateTime, "seconds");
         setElapsedSeconds(elapsed);
       }, 1000);
 
-      // Clean up the interval when the component is unmounted or when isStarted becomes false
       return () => clearInterval(intervalId);
     }
   }, [currentActivity.timeStamp, currentActivity.isStarted]);
 
-  // Conditionally render the main div based on isStarted
   if (!currentActivity.isStarted) {
-    return null; // or return an empty div or any other content you want
+    return null;
   }
 
-  const duration = Duration.fromObject({ seconds: elapsedSeconds });
-  const formattedTime = duration.toFormat("hh:mm:ss");
+  const formattedTime = moment.utc(elapsedSeconds * 1000).format("HH:mm:ss");
 
   return (
     <div style={{ backgroundColor: currentActivity.color }}>

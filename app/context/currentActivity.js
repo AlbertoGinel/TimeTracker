@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+console.log("CurrentActivity");
+
 // Create a store
 const useCurrentActivity = create((set) => ({
   currentActivity: {

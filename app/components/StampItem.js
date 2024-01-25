@@ -1,34 +1,32 @@
 "use client";
 
-import { DateTime } from "luxon";
+import * as moment from "moment";
 
 export default function StampItem({ stamp }) {
-  // Check if stamp or stamp.time is undefined
   if (!stamp || !stamp.time) {
-    return null; // or handle the missing data in a different way
+    return null;
   }
 
-  const utcDateTime = DateTime.fromISO(stamp.time, { zone: "utc" });
+  const utcDateTime = moment.utc(stamp.time);
 
-  // Check if the conversion to local time was successful
-  if (!utcDateTime.isValid) {
-    return null; // or handle the invalid date in a different way
+  if (!utcDateTime.isValid()) {
+    return null;
   }
 
-  const localDateTime = utcDateTime.toLocal();
+  const localDateTime = utcDateTime.local();
 
-  // Format the result
-  const formattedLocalTime = localDateTime.toFormat("HH:mm dd/MM/yy");
+  const formattedLocalTime = localDateTime.format("HH:mm DD/MM/YY");
 
   const symbol =
     stamp.type === "start" ? "➡️" : stamp.type === "stop" ? "🛑" : "";
 
   return (
     <div style={{ backgroundColor: stamp.activities.color }}>
-      <span>
+      <div>
         {stamp.activities.icon} {stamp.activities.name}
-        {symbol} {formattedLocalTime}
-      </span>
+        {symbol}
+      </div>
+      <div>{formattedLocalTime}</div>
     </div>
   );
 }

@@ -56,8 +56,6 @@ export default function LoginPage() {
     setUser(null);
   };
 
-  //console.log({ loading, user });
-
   if (loading) {
     return <h1>loading..</h1>;
   }
