@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Time Tracker
 
-## Getting Started
+This project is aimed at challenging and enhancing my Next.js skills, and it involves developing a personalized time tracker, akin to commercial tools like [Clockify](https://clockify.me/).
 
-First, run the development server:
+## Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+The current state of the application serves as a debugger for the underlying structure. It primarily deals with times and dates, which can be error-prone.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+![Time Tracker Debugger](https://prod-files-secure.s3.us-west-2.amazonaws.com/47ed398c-279d-4699-9676-bb092ad8328b/3b185454-7db2-4408-ac61-f31e9846022e/Untitled.png)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Core Model Prototyping
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+At this stage, the focus is on prototyping the core model for the timer. The approach is centered around the belief that the truth lies in the stamps, and the rest of the information generates accordingly. The database specifically stores activities, user profiles, and stamps.
 
-## Learn More
+![Database Schema](https://prod-files-secure.s3.us-west-2.amazonaws.com/47ed398c-279d-4699-9676-bb092ad8328b/8236c96d-728a-4224-a5d3-4cfd8a7696a2/Untitled.png)
 
-To learn more about Next.js, take a look at the following resources:
+### Keywords
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Activities:** Each activity has an associated icon and color, e.g., Sleep, etc.
+- **Stamp:** Signifying the start and stop, each stamp has an associated activity and timestamp.
+- **Interval:** Defined by a starting stamp and ending with a stop or a new start.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Client-Side Processing
 
-## Deploy on Vercel
+Given the diverse client-side processing requirements, a context-based approach is adopted, leveraging Zustand. However, there are challenges with dependencies between stores, currently hindering the app's functionality.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+![Client Context](https://prod-files-secure.s3.us-west-2.amazonaws.com/47ed398c-279d-4699-9676-bb092ad8328b/0b76ae92-e8e1-4dbf-8bff-a9497f945637/Untitled.png)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Index Context
+
+The `Index` context is introduced to bring order among the dedicated contexts.
+
+- **Stamps and Activity Context:** Simple contexts that hold arrays.
+
+  ![Stamps and Activity Context](https://prod-files-secure.s3.us-west-2.amazonaws.com/47ed398c-279d-4699-9676-bb092ad8328b/122387bf-72be-4c2d-9b28-3b2653e1e83e/Untitled.png)
+
+- **Intervals Context:** A more complex context that filters stamps, eliminates redundancy, removes quickly updated stamps, and crucially, creates the interval array based on the stamps.
+
+  ![Intervals Context](https://prod-files-secure.s3.us-west-2.amazonaws.com/47ed398c-279d-4699-9676-bb092ad8328b/e197f37f-b40e-452f-a2b0-dccc0a221487/Untitled.png)
+
+## Backend
+
+The backend, implemented using Next.js, follows a straightforward structure. The API routes are defined in `route.js`.
+
+![Backend Structure](https://prod-files-secure.s3.us-west-2.amazonaws.com/47ed398c-279d-4699-9676-bb092ad8328b/cd10ba9b-1643-40dd-bf6d-f57ddca52300/Untitled.png)
+
+The API endpoint `fetch("/api/activities")` performs a GET request. Notably, Prisma is used to retrieve user activities.
+
+![API Endpoint](https://prod-files-secure.s3.us-west-2.amazonaws.com/47ed398c-279d-4699-9676-bb092ad8328b/7e83ffca-e1bf-48d3-8d8f-c8d78aa7e18a/Untitled.png)
+
+## Frontend
+
+The current frontend may lack visual appeal, but it successfully updates counters every second.
+
+![Frontend](https://prod-files-secure.s3.us-west-2.amazonaws.com/47ed398c-279d-4699-9676-bb092ad8328b/c92a66a1-5c76-4b72-9043-608605708124/Untitled.png)
+
+Regular components were initially responsible for data generation, but this responsibility has been shifted to the `Index` context.
